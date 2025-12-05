@@ -1,0 +1,545 @@
+{
+  "Infraestructura_y_Redes": [
+    {
+      "id": "IR_SCAN_01",
+      "control": "Actualización segura de servidor MySQL",
+      "descripcion": "Mantener el servidor MySQL del CDA actualizado a una versión soportada y con los últimos parches de seguridad, planificando y probando las actualizaciones para evitar impactos en las aplicaciones de diagnóstico y gestión.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Gestión de parches y vulnerabilidades",
+      "referencia": "ISO 27001 A.8.8, A.8.9; NIST CSF PR.IP-12, PR.MA-1",
+      "recomendacion": "En el servidor 192.168.0.3 (puerto 3306/tcp) inventariar las aplicaciones que usan MySQL 5.7.37, coordinar con el proveedor del software de CDA si es compatible con MySQL 8.x y definir una ruta única de actualización: 1) si el software soporta 8.x, planear migración directa a MySQL 8.0.42 o versión LTS soportada, realizando copia de seguridad completa y pruebas en un entorno de pruebas antes del cambio; 2) si aún requiere 5.7, actualizar como mínimo a la última versión 5.7 soportada indicada en los boletines de Oracle (>=5.7.43), documentar la excepción temporal y programar a corto plazo el proyecto de migración a 8.x con el proveedor.",
+      "madurez": "4",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_02",
+      "control": "Endurecimiento de exposición del puerto MySQL",
+      "descripcion": "Limitar la exposición de MySQL en red para que solo los servidores y estaciones autorizadas dentro del CDA puedan conectarse, reduciendo la superficie de ataque.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Segmentación y control de acceso de red",
+      "referencia": "ISO 27001 A.8.20; NIST CSF PR.AC-5, PR.PT-3",
+      "recomendacion": "Revisar en el firewall perimetral y en el firewall de Windows del servidor 192.168.0.3 que el puerto 3306/tcp solo acepte conexiones desde los servidores de aplicación internos que requieren la base de datos (por ejemplo, el servidor del software de CDA) y bloquear cualquier acceso desde subredes de usuarios, WiFi invitados o desde Internet. En MySQL, configurar bind-address a una IP interna específica y deshabilitar escuchas en todas las interfaces si no es necesario.",
+      "madurez": "4",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_03",
+      "control": "Actualización mayor y consolidación de versión de Apache Tomcat",
+      "descripcion": "Estandarizar y actualizar Apache Tomcat a una rama soportada y reciente que corrija vulnerabilidades de DoS, request smuggling y session fixation, asegurando compatibilidad con las aplicaciones del CDA.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Gestión de parches y ciclo de vida de plataformas",
+      "referencia": "ISO 27001 A.8.8, A.8.9; NIST CSF PR.IP-12, PR.MA-1; OWASP ASVS V1, V14",
+      "recomendacion": "En el servidor 192.168.0.3 (puerto 8090/tcp) identificar qué aplicación del CDA utiliza Tomcat 8.5.89. Consultar compatibilidad con Tomcat 9.x/10.x con el fabricante del software y, si es compatible, planear la actualización a al menos Tomcat 9.0.108 o versión posterior estable recomendada por el proveedor. Realizar un clon del servidor o entorno de pruebas donde desplegar la nueva versión, migrar la aplicación, ejecutar pruebas funcionales (emisión de certificados, reportes RUNT, etc.) y, tras validar, programar ventana de mantenimiento para cambiar a la nueva versión y retirar Tomcat 8.5.89.",
+      "madurez": "4",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_04",
+      "control": "Endurecimiento de configuración Tomcat y protección ante DoS",
+      "descripcion": "Ajustar parámetros de red y de protocolo HTTP/HTTP2 en Apache Tomcat para limitar el impacto de ataques de denegación de servicio y request smuggling sobre los sistemas del CDA.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Configuración segura de servicios",
+      "referencia": "ISO 27001 A.8.9; NIST CSF PR.DS-4, PR.PT-4; OWASP ASVS V14",
+      "recomendacion": "Una vez actualizado Tomcat en 192.168.0.3, revisar y ajustar server.xml y web.xml: 1) configurar límites como maxThreads, maxConnections, connectionTimeout y maxHttpHeaderSize según capacidad del servidor; 2) deshabilitar HTTP/2 si no se requiere o aplicar los parámetros recomendados por la documentación de Tomcat para mitigar MadeYouReset; 3) activar filtros de seguridad (RemoteIpFilter, RequestDumperFilter solo en pruebas) y deshabilitar métodos HTTP innecesarios (TRACE, PUT, DELETE, etc.) para las aplicaciones del CDA; 4) habilitar logs de acceso y errores detallados para detectar patrones de DoS y smuggling y supervisarlos con el equipo de TI.",
+      "madurez": "4",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_05",
+      "control": "Mitigación de session fixation en aplicaciones sobre Tomcat",
+      "descripcion": "Configurar correctamente la gestión de sesiones en Tomcat y en las aplicaciones del CDA para evitar que un atacante pueda fijar o secuestrar sesiones de usuarios internos o externos.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Gestión de sesiones y autenticación",
+      "referencia": "ISO 27001 A.8.16; NIST CSF PR.AC-7; OWASP ASVS V2, V3",
+      "recomendacion": "Tras actualizar Tomcat en 192.168.0.3, verificar en web.xml de las aplicaciones que se regeneren los IDs de sesión después de autenticación, que la cookie JSESSIONID tenga las banderas HttpOnly y Secure activadas cuando se use HTTPS, y que se definan tiempos de expiración de sesión acordes al uso del CDA (por ejemplo 15–30 minutos de inactividad). Realizar pruebas de login/logout con usuarios internos de líneas de inspección para confirmar que no se mantiene la misma sesión al cambiar de usuario.",
+      "madurez": "4",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_06",
+      "control": "Endurecimiento de cifrados TLS en servicios HTTPS internos",
+      "descripcion": "Eliminar suites de cifrado TLS obsoletas y vulnerables en los servicios HTTPS utilizados por el CDA, manteniendo solo cifrados fuertes y protocolos soportados.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Gestión de cifrado y comunicaciones seguras",
+      "referencia": "ISO 27001 A.8.24; NIST CSF PR.DS-2, PR.PT-4; OWASP ASVS V9",
+      "recomendacion": "En el host 192.168.0.1 (puerto 443/tcp) acceder a la configuración del servidor web o dispositivo que publica HTTPS y deshabilitar el cifrado TLS_RSA_WITH_3DES_EDE_CBC_SHA (SWEET32) y cualquier otro cifrado débil. Mantener solo TLS 1.2/1.3 con suites modernas basadas en AES-GCM o CHACHA20 y ECDHE. Después de los cambios, ejecutar un nuevo escaneo (OpenVAS o SSL Labs) para validar que el servicio ya no acepta 3DES ni otros algoritmos inseguros.",
+      "madurez": "4",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_01",
+      "control": "Actualización mayor de Apache Tomcat expuesto",
+      "descripcion": "Asegurar que el servidor Apache Tomcat expuesto en la red interna o perimetral del CDA se mantenga en versiones soportadas y libres de vulnerabilidades críticas de autenticación, redirección abierta y denegación de servicio.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Endurecimiento de servicios",
+      "referencia": "ISO 27001 A.8.8, A.12.6; NIST CSF PR.IP-12, PR.PT-3; OWASP ASVS V1, V9",
+      "recomendacion": "En el host 192.168.0.3 (puerto 8090/tcp), planear y ejecutar una migración controlada de Tomcat 8.5.89 a una versión soportada que corrija todas las vulnerabilidades reportadas (mínimo 9.0.96 o superior LTS recomendada por el proveedor), incluyendo: ambiente de pruebas previo, respaldo completo de las aplicaciones del CDA (p.ej. sistema de gestión de revisiones, historiales de vehículos), ajuste de conectores (server.xml), validación de compatibilidad de aplicaciones y posterior actualización en producción en ventana de mantenimiento documentada.",
+      "madurez": "4",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_02",
+      "control": "Endurecimiento de configuración HTTP en Tomcat",
+      "descripcion": "Configurar Apache Tomcat para reducir el riesgo de explotación de vulnerabilidades de redirección abierta y otros abusos de la capa HTTP.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Endurecimiento de servicios",
+      "referencia": "ISO 27001 A.8.8; NIST CSF PR.AC-3, PR.DS-5; OWASP ASVS V5, V10",
+      "recomendacion": "En el Tomcat de 192.168.0.3:8090, revisar y ajustar web.xml y context.xml de las aplicaciones del CDA para: (1) evitar construcciones de redirección basadas en parámetros sin validación (por ejemplo, validar listas blancas de URLs internas del CDA antes de hacer redirect), (2) deshabilitar o proteger con autenticación robusta cualquier interfaz de administración (/manager, /host-manager), y (3) limitar métodos HTTP a los estrictamente necesarios (GET/POST) en los contextos del sistema de diagnósticos.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_03",
+      "control": "Gestión de carga y protección frente a DoS en Tomcat",
+      "descripcion": "Configurar el servidor de aplicaciones para minimizar el impacto de ataques de denegación de servicio (DoS) que puedan interrumpir la operación del CDA.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Continuidad y resiliencia",
+      "referencia": "ISO 27001 A.8.16, A.5.30; NIST CSF PR.PT-5, DE.CM-1",
+      "recomendacion": "En 192.168.0.3:8090, una vez actualizado Tomcat, configurar en server.xml límites razonables para el CDA, tales como maxThreads, connectionTimeout, maxConnections y un limitador de tamaño de petición (maxPostSize, maxHttpHeaderSize) acorde al volumen típico de operaciones de revisión técnico-mecánica y emisión de certificados, y reforzar con reglas en el firewall perimetral para limitar ráfagas de conexiones desde una misma IP.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_04",
+      "control": "Endurecimiento de TLS y eliminación de cifrados débiles",
+      "descripcion": "Configurar todos los servicios TLS/SSL del CDA para usar únicamente protocolos y suites criptográficas robustas, eliminando RC4, SEED y otros algoritmos débiles.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Criptografía y comunicaciones seguras",
+      "referencia": "ISO 27001 A.8.24, A.8.25; NIST CSF PR.DS-2, PR.PT-4; OWASP ASVS V9",
+      "recomendacion": "En los hosts 192.168.0.100:443 y 192.168.0.1:443, ajustar la configuración del servidor web o balanceador (IIS/Apache/Nginx u otro) para: (1) deshabilitar suites con RC4, SEED y MD5, (2) habilitar solo TLSv1.2 y TLSv1.3 con suites modernas (por ejemplo, TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 o equivalentes recomendados por el proveedor), y (3) verificar con una nueva corrida de escaneo que ya no se reporten cifrados débiles.",
+      "madurez": "4",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_05",
+      "control": "Deshabilitar SSLv2/SSLv3 en servicios expuestos",
+      "descripcion": "Eliminar el uso de protocolos SSLv2 y SSLv3 en los servicios del CDA para evitar ataques conocidos sobre protocolos obsoletos.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Criptografía y comunicaciones seguras",
+      "referencia": "ISO 27001 A.8.24, A.8.25; NIST CSF PR.PT-4; OWASP ASVS V9.1",
+      "recomendacion": "En los servicios de 192.168.0.100:443 y 192.168.0.1:4433, modificar la configuración del servidor (por ejemplo, ssl_protocols en Nginx o SchUseStrongCrypto en Windows) para deshabilitar explícitamente SSLv2 y SSLv3, manteniendo únicamente TLSv1.2 y, si es compatible con las aplicaciones del CDA, TLSv1.3; probar posteriormente el acceso de las aplicaciones internas (p.ej. portal de consulta de certificados) para confirmar que no se rompe la operación.",
+      "madurez": "4",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_06",
+      "control": "Fortalecimiento de configuración SSH en servidores Linux",
+      "descripcion": "Asegurar que el servicio SSH use únicamente algoritmos de clave de host y de intercambio de claves considerados seguros, eliminando algoritmos obsoletos como DSA y Diffie-Hellman de 1024 bits.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Acceso remoto seguro",
+      "referencia": "ISO 27001 A.8.24, A.8.2; NIST CSF PR.AC-3, PR.PT-4; CIS Controls 4 y 5",
+      "recomendacion": "En el host 192.168.0.100 (puerto 22/tcp), editar sshd_config para: (1) deshabilitar HostKey de tipo DSA (ssh-dss) y generar/usar claves RSA o ED25519 de longitud recomendada, (2) deshabilitar el KEX diffie-hellman-group1-sha1 y habilitar grupos fuertes como curve25519-sha256 o diffie-hellman-group14/16/18, y (3) reiniciar el servicio SSH fuera de horario crítico del CDA, validando la conexión con las herramientas de administración remota usadas por el personal de TI.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_07",
+      "control": "Gestión de ciclo de vida de MySQL en servidores de aplicaciones CDA",
+      "descripcion": "Mantener la base de datos MySQL en versiones soportadas y con parches de seguridad aplicados, considerando la criticidad de los datos operativos del CDA (resultados de revisiones, historiales de vehículos, facturación).",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Gestión de vulnerabilidades y parches",
+      "referencia": "ISO 27001 A.8.8, A.12.6; NIST CSF ID.RA-1, PR.IP-12; CIS Controls 7, 16",
+      "recomendacion": "En el servidor 192.168.0.3:3306, diseñar y ejecutar un plan de actualización de MySQL desde la versión 5.7.37 a una versión actualmente soportada por Oracle (por ejemplo, 8.0.x LTS compatible con la aplicación del CDA), incluyendo: respaldo completo de bases de datos, pruebas en ambiente de ensayo con el software de gestión de revisiones y certificados, verificación de compatibilidad de conectores y, finalmente, actualización en producción en ventana programada, asegurando que las vulnerabilidades cpujul2023, cpuoct2022 y cpuoct2025 queden mitigadas.",
+      "madurez": "4",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_08",
+      "control": "Endurecimiento de MySQL expuesto en red interna",
+      "descripcion": "Reducir la superficie de ataque de MySQL limitando el acceso a la base de datos únicamente a las aplicaciones del CDA que lo requieran y aplicando configuraciones seguras.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Segmentación y control de puertos",
+      "referencia": "ISO 27001 A.8.20, A.8.21; NIST CSF PR.AC-5, PR.PT-3; CIS Control 14",
+      "recomendacion": "Para el servicio MySQL en 192.168.0.3:3306, configurar reglas en el firewall interno para permitir conexiones solo desde los servidores de aplicaciones y sistemas del CDA que consumen la base de datos (por ejemplo, servidor de aplicación de línea de revisión y sistema contable) y bloquear el acceso desde estaciones de trabajo comunes u otras subredes; adicionalmente, revisar que bind-address restringa la escucha a la red interna necesaria y no a todas las interfaces.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_01",
+      "control": "Endurecimiento TLS en routers y equipos de red",
+      "descripcion": "Actualizar y endurecer la configuración SSL/TLS de los dispositivos de red (routers, access points, equipos de administración) para eliminar algoritmos y claves criptográficas débiles, certificados vencidos y renegociación insegura.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Endurecimiento de Servicios",
+      "referencia": "ISO 27001 A.8.28, A.10.1; NIST CSF PR.AC-3, PR.DS-2; OWASP ASVS V9.1",
+      "recomendacion": "Para los hosts 192.168.0.1 y 192.168.0.100: 1) Generar nuevos certificados con claves RSA >= 2048 bits o preferiblemente ECDSA, renovando los certificados vencidos (especialmente el servicio en 192.168.0.1:4433). 2) Deshabilitar en la interfaz de administración HTTPS todos los key-exchange inseguros (MODP 1024, DH de 1024 bits, TLS 1.0 y 1.1) y dejar solo TLS 1.2/1.3 con suites fuertes (por ejemplo, ECDHE-ECDSA/AES-GCM). 3) Deshabilitar o limitar la renegociación TLS para mitigar CVE-2011-1473/CVE-2011-5094 conforme a las guías del fabricante TP-Link. Documentar el procedimiento para repetirlo tras actualizaciones de firmware.",
+      "madurez": "4",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_02",
+      "control": "Gestión de certificados TLS internos del CDA",
+      "descripcion": "Establecer un procedimiento formal para la gestión del ciclo de vida de certificados TLS usados en la red interna (equipos de red, aplicaciones web internas, consolas de administración), evitando claves débiles y expiración de certificados.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Criptografía y Gestión de Certificados",
+      "referencia": "ISO 27001 A.8.24, A.10.1; NIST CSF PR.AC-1, PR.DS-1",
+      "recomendacion": "Inventariar todos los servicios HTTPS internos (por ejemplo 192.168.0.1:443 y 4433, 192.168.0.100:443), registrar fechas de expiración y longitud de las claves y configurar recordatorios automáticos (calendario o herramienta de monitoreo) para renovar certificados al menos 30 días antes de su vencimiento y garantizar siempre claves de 2048 bits o superiores. Definir quién es responsable (rol TI del CDA o proveedor) y documentar la generación, instalación y prueba de cada certificado.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_03",
+      "control": "Actualización de firmware de dispositivos de red",
+      "descripcion": "Mantener actualizado el firmware de routers y equipos de red que exponen servicios SSL/TLS, para asegurar compatibilidad con configuraciones criptográficas modernas y correcciones de vulnerabilidades conocidas.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Gestión de Cambios y Parches de Infraestructura",
+      "referencia": "ISO 27001 A.8.8, A.8.9; NIST CSF PR.IP-12, DE.CM-8",
+      "recomendacion": "Para los dispositivos TP-Link asociados a 192.168.0.1 y 192.168.0.100, identificar el modelo y versión de firmware, descargar desde el portal oficial del fabricante la última versión estable y aplicar la actualización siguiendo buenas prácticas (respaldo de configuración previo, ventana de mantenimiento, verificación posterior), validando después que las opciones de deshabilitar renegociación insegura y algoritmos débiles estén disponibles y activadas.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_04",
+      "control": "Filtrado de puertos RPC internos",
+      "descripcion": "Restringir el acceso a servicios DCE/RPC y MSRPC expuestos en la red interna de Windows, permitiendo únicamente el tráfico desde segmentos y equipos autorizados para tareas de administración.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Firewall y Control de Acceso a Red",
+      "referencia": "ISO 27001 A.8.20, A.8.21; NIST CSF PR.AC-5, PR.PT-4",
+      "recomendacion": "Para el host 192.168.0.109 (puerto 135/tcp y dinámicos como 49664/tcp) configurar políticas de firewall en Windows Defender Firewall y/o firewall perimetral para permitir conexiones RPC solo desde la subred de administración (por ejemplo, estaciones del área de sistemas o servidor de dominio) y bloquear el resto. Revisar que servicios sensibles como lsass.exe y SAM no sean accesibles desde equipos de operación de línea (puestos de inspección vehicular) ni desde redes de invitados.",
+      "madurez": "4",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_01",
+      "control": "Filtrado de puertos MSRPC internos",
+      "descripcion": "Restringir el acceso a los puertos dinámicos DCE/RPC y MSRPC de los servidores Windows, permitiendo únicamente conexiones desde segmentos y equipos autorizados.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Firewall",
+      "referencia": "ISO 27001 A.8.20, A.8.23; NIST CSF PR.AC-5, PR.IP-1",
+      "recomendacion": "En el firewall perimetral y en el firewall de host de 192.168.0.3, crear reglas que bloqueen el acceso a los puertos 135/tcp y al rango dinámico 49152–65535/tcp desde toda la red, excepto desde los controladores de dominio y estaciones de administración explícitamente autorizadas del CDA. Documentar qué sistemas realmente necesitan comunicación MSRPC y denegar todo lo demás.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_02",
+      "control": "Endurecimiento de cifrados y protocolos TLS en RDP",
+      "descripcion": "Deshabilitar TLS 1.0 y 1.1 y cifrados débiles en los servicios que ofrecen RDP, obligando al uso de TLS 1.2 o superior y suites criptográficas robustas.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Endurecimiento de servicios",
+      "referencia": "ISO 27001 A.8.23; NIST CSF PR.AC-17, PR.DS-2; OWASP ASVS V9",
+      "recomendacion": "En el servidor 192.168.0.3, configurar las directivas de seguridad de Windows para RDP (Schannel) para deshabilitar TLS 1.0 y 1.1 y forzar TLS 1.2+, siguiendo la guía de Microsoft. Verificar con un nuevo escaneo que solo se ofrezca TLS 1.2 o superior y revisar regularmente la configuración después de actualizaciones.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_03",
+      "control": "Protección de acceso a routers y equipos de red por HTTPS",
+      "descripcion": "Evitar el uso de HTTP para el acceso de administración a routers y dispositivos de red, habilitando exclusivamente la interfaz de gestión por HTTPS con certificados válidos.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Acceso remoto",
+      "referencia": "ISO 27001 A.8.20; NIST CSF PR.AC-3, PR.AC-5; OWASP ASVS V9.1",
+      "recomendacion": "En los dispositivos con IP 192.168.0.1 y 192.168.0.100 (por ejemplo router TP-Link), deshabilitar la administración vía HTTP en el puerto 80, habilitar solo HTTPS en un puerto de gestión (por ejemplo 443 o uno personalizado), instalar/renovar un certificado TLS y configurar redirección automática de cualquier intento HTTP a HTTPS antes de mostrar campos de contraseña.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_01",
+      "control": "Deshabilitar TLS 1.0 y 1.1 en servicios internos y perimetrales",
+      "descripcion": "Configurar todos los servicios que usan SSL/TLS (bases de datos, aplicaciones web, equipos de red) para aceptar únicamente TLS 1.2 o superior, eliminando el soporte de TLS 1.0 y TLS 1.1.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Endurecimiento de servicios",
+      "referencia": "ISO 27001 A.8.20, A.8.23; NIST CSF PR.DS-2, PR.AC-5; OWASP ASVS 1.2.2",
+      "recomendacion": "En 192.168.0.3:3306, 192.168.0.100:443, 192.168.0.250:4443 y 192.168.0.1:4433 editar la configuración de MySQL, servidores web o de administración y del equipo perimetral para deshabilitar explícitamente TLS 1.0 y 1.1 y permitir solo TLS 1.2/1.3, probando primero en ambiente de pruebas o en horario de baja operación del CDA.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_02",
+      "control": "Fortalecer cifrados y algoritmos de intercambio de claves TLS",
+      "descripcion": "Restringir las suites de cifrado TLS a algoritmos robustos y asegurar que el intercambio de claves use ECDHE o grupos Diffie-Hellman de 2048 bits o superiores.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Endurecimiento de servicios",
+      "referencia": "ISO 27001 A.8.24; NIST CSF PR.DS-2; OWASP ASVS 1.2.3",
+      "recomendacion": "En 192.168.0.1:4433 revisar la configuración del servidor TLS (por ejemplo, en el router/firewall o servidor web) para usar ECDHE como método preferido y/o un grupo DH de al menos 2048 bits, eliminando grupos de 1024 bits; validar con herramientas como SSL Labs o testssl.sh.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_03",
+      "control": "Reemplazo de certificados con algoritmos de firma fuertes",
+      "descripcion": "Asegurar que todos los certificados digitales usados en el CDA estén firmados con algoritmos SHA-256 o superiores, evitando SHA-1 o más débiles.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Gestión de certificados",
+      "referencia": "ISO 27001 A.8.24; NIST CSF PR.AC-1, PR.DS-2; OWASP ASVS 1.2.1",
+      "recomendacion": "En 192.168.0.1:443 reemplazar el certificado con firma sha1WithRSAEncryption por un certificado nuevo firmado con SHA-256 o superior, emitido por una CA confiable, y documentar la fecha de vencimiento y proceso de renovación.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_04",
+      "control": "Restringir cifrados débiles en SSH",
+      "descripcion": "Configurar los servidores SSH para aceptar únicamente algoritmos de cifrado modernos y seguros, deshabilitando cifrados CBC y otros considerados débiles.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Acceso remoto seguro",
+      "referencia": "ISO 27001 A.8.20, A.8.23; NIST CSF PR.AC-3, PR.AC-5; OWASP ASVS 2.1.1",
+      "recomendacion": "En el servidor 192.168.0.100:22 editar el archivo de configuración de SSH (por ejemplo /etc/ssh/sshd_config) para deshabilitar 3des-cbc, aes128-cbc, aes256-cbc, twofish-cbc y variantes, y permitir solo cifrados como aes256-gcm@openssh.com, chacha20-poly1305@openssh.com; reiniciar el servicio y probar el acceso administrativo.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_05",
+      "control": "Ajuste de TCP timestamps para reducir exposición de información",
+      "descripcion": "Revisar y ajustar la configuración de timestamps TCP en servidores y equipos de red para minimizar la revelación de información sobre el sistema sin afectar la operación.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Endurecimiento de sistema operativo",
+      "referencia": "ISO 27001 A.8.20; NIST CSF PR.AC-5, PR.IP-1; OWASP Testing Guide 4.9",
+      "recomendacion": "En los hosts 192.168.0.250 y 192.168.0.100 evaluar el impacto y, si es viable, deshabilitar o limitar los TCP timestamps (por ejemplo net.ipv4.tcp_timestamps=0 en Linux o el ajuste netsh en Windows), verificando que no haya efectos negativos en aplicaciones de diagnóstico y gestión del CDA.",
+      "madurez": "2",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_01",
+      "control": "Deshabilitar compresión TLS en servidores internos",
+      "descripcion": "Deshabilitar los métodos de compresión TLS/SSL (como DEFLATE) en los servicios HTTPS internos para evitar ataques tipo CRIME y fuga de información cifrada.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Endurecimiento de servicios",
+      "referencia": "ISO 27001 A.8.20, A.8.21; NIST CSF PR.DS-2, PR.DS-5; OWASP ASVS V9.1",
+      "recomendacion": "En los servidores que atienden 192.168.0.1:443 y 192.168.0.100:443 (por ejemplo Apache, Nginx, IIS o dispositivos UTM), editar la configuración TLS para deshabilitar toda compresión (TLSCompression off, ssl_compression off o equivalente), asegurar que SPDY <4 no esté habilitado y preferir HTTP/2 sin compresión TLS. Reiniciar los servicios y validar con un nuevo escaneo que no se ofrezca DEFLATE.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_02",
+      "control": "Endurecimiento de parámetros TCP en servidores y firewall",
+      "descripcion": "Configurar los parámetros TCP en servidores y equipos de red para reducir la exposición de información a través de timestamps TCP, evitando que un atacante pueda estimar uptime o realizar fingerprinting avanzado.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Endurecimiento de sistemas",
+      "referencia": "ISO 27001 A.8.9, A.8.15; NIST CSF PR.AC-5, PR.IP-1",
+      "recomendacion": "En los equipos que responden con timestamps TCP (p.ej. 192.168.0.1 y otros servidores Linux/Windows del CDA), aplicar una política estándar: en Linux, definir 'net.ipv4.tcp_timestamps = 0' en /etc/sysctl.conf y ejecutar 'sysctl -p'; en Windows, configurar 'netsh int tcp set global timestamps=disabled' cuando sea soportado. Documentar esta configuración como plantilla de endurecimiento para todos los servidores del CDA.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_03",
+      "control": "Filtrado y deshabilitación de ICMP timestamp en red interna",
+      "descripcion": "Limitar o deshabilitar las respuestas ICMP timestamp en routers, firewalls y sistemas finales para evitar la exposición de información de tiempo de sistema y facilitar menos el reconocimiento de la red.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Firewall y control de tráfico",
+      "referencia": "ISO 27001 A.8.20; NIST CSF PR.AC-5, DE.AE-1",
+      "recomendacion": "En los equipos que responden ICMP timestamp (192.168.0.1, 192.168.0.100, 192.168.0.116, 192.168.0.250), deshabilitar el manejo de ICMP type 13/14 en el sistema operativo y configurar el firewall perimetral y los firewalls host-based para bloquear ICMP timestamp desde y hacia redes no confiables. Mantener ICMP básico solo para diagnóstico interno controlado.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "IR_SCAN_04",
+      "control": "Endurecimiento de cifrado y MAC en servicios SSH",
+      "descripcion": "Restringir los algoritmos MAC y de cifrado permitidos en los servidores SSH para evitar el uso de algoritmos débiles como hmac-md5 y hmac-sha1-96.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Acceso remoto seguro",
+      "referencia": "ISO 27001 A.8.21, A.8.32; NIST CSF PR.AC-3, PR.DS-5; OWASP ASVS V9.2",
+      "recomendacion": "En el servidor SSH de 192.168.0.100:22, editar el archivo de configuración (por ejemplo /etc/ssh/sshd_config) para deshabilitar 'hmac-md5' y 'hmac-sha1-96' en las directivas MACs, permitiendo solo algoritmos robustos (por ejemplo, hmac-sha2-256, hmac-sha2-512). Reiniciar el servicio SSH y verificar con un escaneo que los MAC débiles ya no se ofrezcan.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    }
+  ],
+  "Aplicativos_y_Datos": [
+    {
+      "id": "AD_SCAN_01",
+      "control": "Actualización y modernización de motor de base de datos MySQL",
+      "descripcion": "Actualizar el servidor MySQL a una versión soportada y segura, eliminando versiones obsoletas con múltiples vulnerabilidades, y planificar la migración de aplicaciones que dependan de versiones antiguas.",
+      "categoria": "Aplicativos y Datos",
+      "dominio": "Gestión de Parches y Ciclo de Vida de Software",
+      "referencia": "ISO 27001 A.8.8, A.8.9; NIST CSF PR.IP-12; OWASP ASVS V14.2",
+      "recomendacion": "Para el host 192.168.0.3 (MySQL 5.7.37 en puerto 3306/tcp), planificar y ejecutar la migración a una versión soportada (p.e. 8.0.40 o superior). Incluir: respaldo completo de bases de datos de gestión de vehículos y CDA, pruebas en ambiente de ensayo con las aplicaciones del CDA, actualización del conector de las aplicaciones si es necesario y verificación posterior de rendimiento y compatibilidad. Documentar el procedimiento de actualización para futuras versiones.",
+      "madurez": "4",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "AD_SCAN_02",
+      "control": "Endurecimiento de configuración y acceso a MySQL",
+      "descripcion": "Asegurar que el servicio MySQL solo sea accesible por las aplicaciones que lo requieren, con autenticación fuerte y configuración segura para reducir el impacto de vulnerabilidades remanentes.",
+      "categoria": "Aplicativos y Datos",
+      "dominio": "Seguridad de Bases de Datos",
+      "referencia": "ISO 27001 A.8.2, A.8.20; NIST CSF PR.DS-5; OWASP ASVS V9.2",
+      "recomendacion": "En 192.168.0.3:3306, limitar el binding de MySQL a la interfaz interna necesaria (por ejemplo 127.0.0.1 o VLAN de servidores), restringir el acceso mediante firewall solo desde los servidores de aplicación del CDA, revisar usuarios y contraseñas (eliminar cuentas por defecto o sin uso, exigir contraseñas robustas) y habilitar cifrado de conexión (TLS) entre aplicaciones y la base de datos cuando sea soportado.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "AD_SCAN_03",
+      "control": "Actualización de servidor de aplicaciones Apache Tomcat",
+      "descripcion": "Actualizar Apache Tomcat a una versión soportada y corregida para vulnerabilidades de DoS y bypass de restricciones de seguridad, garantizando que las aplicaciones del CDA no se ejecuten sobre versiones obsoletas.",
+      "categoria": "Aplicativos y Datos",
+      "dominio": "Gestión de Parches de Aplicaciones",
+      "referencia": "ISO 27001 A.8.8, A.8.9; NIST CSF PR.IP-12; OWASP ASVS V14.2",
+      "recomendacion": "Para el servicio en 192.168.0.3:8090/tcp (Tomcat 8.5.89), actualizar según el recommendation del fabricante a una versión corregida (p.ej. 9.0.105 o superior, o 10.x/11.x si es compatible). Antes de actualizar, realizar copia de seguridad de configuración (server.xml, context.xml) y de las aplicaciones desplegadas, probar la nueva versión en un entorno de prueba y después ejecutar pruebas funcionales de los sistemas del CDA (informes, consultas de vehículos, integración con RUNT, etc.).",
+      "madurez": "4",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "AD_SCAN_04",
+      "control": "Revisión de configuración de seguridad en Tomcat",
+      "descripcion": "Endurecer la configuración de Apache Tomcat para minimizar el riesgo de explotación de vulnerabilidades de bypass de seguridad y denegación de servicio.",
+      "categoria": "Aplicativos y Datos",
+      "dominio": "Seguridad de Aplicaciones",
+      "referencia": "ISO 27001 A.8.23; NIST CSF PR.DS-5; OWASP ASVS V1, V19",
+      "recomendacion": "Tras la actualización de Tomcat en 192.168.0.3:8090, revisar y ajustar: 1) restricciones de seguridad en web.xml (roles, métodos HTTP permitidos), 2) deshabilitar o restringir el uso de CGI y funcionalidades no usadas, 3) limitar tamaños de petición/respuesta y tiempo de espera para reducir riesgos de DoS, y 4) deshabilitar manager y host-manager en entornos de producción o protegerlos con autenticación fuerte y acceso solo desde la red de administración.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "AD_SCAN_01",
+      "control": "Actualización mayor de motor de base de datos MySQL",
+      "descripcion": "Mantener el servidor MySQL en una versión soportada y actualizada a la última rama estable, corrigiendo vulnerabilidades acumuladas.",
+      "categoria": "Aplicativos y Datos",
+      "dominio": "Gestión de parches",
+      "referencia": "ISO 27001 A.8.8; NIST CSF PR.IP-12; OWASP ASVS V14.2",
+      "recomendacion": "Planear y ejecutar en el servidor 192.168.0.3 la migración de MySQL 5.7.37 a una versión soportada 8.x recomendada por Oracle (por ejemplo 8.0.40 o superior), incluyendo pruebas de compatibilidad con el software del CDA (SIGO, RUNT, etc.), respaldo completo de bases de datos y plan de reversión documentado. Coordinar la ventana de mantenimiento para no afectar la operación del CDA.",
+      "madurez": "4",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "AD_SCAN_02",
+      "control": "Gestión periódica de parches de MySQL",
+      "descripcion": "Establecer un proceso recurrente de revisión e instalación de parches de seguridad para MySQL en sistemas Windows.",
+      "categoria": "Aplicativos y Datos",
+      "dominio": "Gestión de parches",
+      "referencia": "ISO 27001 A.5.23, A.8.8; NIST CSF PR.IP-3, PR.IP-12; OWASP ASVS V14.2",
+      "recomendacion": "Definir para 192.168.0.3 un ciclo trimestral como máximo para revisar los avisos de seguridad (CPU) de Oracle referentes a MySQL y programar actualizaciones de seguridad. Registrar en un inventario la versión de MySQL instalada, fecha de última actualización y responsables, y verificar con escaneos posteriores que las vulnerabilidades reportadas (CPU 2022–2024) hayan sido cerradas.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "AD_SCAN_01",
+      "control": "Actualización segura del motor de base de datos MySQL",
+      "descripcion": "Mantener el servidor MySQL actualizado a versiones soportadas que incluyan los parches de seguridad más recientes.",
+      "categoria": "Aplicativos y Datos",
+      "dominio": "Gestión de vulnerabilidades de software",
+      "referencia": "ISO 27001 A.8.8, A.8.9; NIST CSF ID.RA-1, PR.IP-12; OWASP ASVS 14.2",
+      "recomendacion": "En 192.168.0.3:3306 planificar y ejecutar la actualización de MySQL desde la versión 5.7.37 a 5.7.41 o superior (o 8.0.32+ si aplica), realizando copia de seguridad completa de las bases de datos del CDA y pruebas de compatibilidad con el software de diagnóstico y de gestión antes de pasar a producción.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    }
+  ],
+  "Gobierno_y_Cumplimiento": [
+    {
+      "id": "GC_SCAN_01",
+      "control": "Política de gestión de parches y versiones de software",
+      "descripcion": "Definir y aplicar una política formal para la gestión de parches, actualizaciones y fin de vida de software crítico (bases de datos, servidores de aplicaciones, dispositivos de red) utilizado por el CDA.",
+      "categoria": "Gobierno y Cumplimiento",
+      "dominio": "Gestión de Cambios y Configuración",
+      "referencia": "ISO 27001 A.5.37, A.8.8, A.8.9; NIST CSF ID.BE-5, PR.IP-3",
+      "recomendacion": "Documentar un procedimiento donde se establezca: inventario de sistemas críticos (MySQL 192.168.0.3, Tomcat 192.168.0.3:8090, routers 192.168.0.1/192.168.0.100), frecuencia de revisión de parches (mensual), responsables de aprobación e instalación y criterios de prioridad (por ejemplo, vulnerabilidades de severidad media o superior corregidas en máximo 60 días). Integrar este procedimiento al plan de mantenimiento del CDA y revisarlo al menos una vez al año.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "GC_SCAN_02",
+      "control": "Normativa interna de uso de criptografía",
+      "descripcion": "Establecer lineamientos internos que definan el uso aceptable de protocolos y algoritmos criptográficos para servicios del CDA, evitando explícitamente certificados débiles, expirados y versiones obsoletas de TLS.",
+      "categoria": "Gobierno y Cumplimiento",
+      "dominio": "Políticas de Seguridad",
+      "referencia": "ISO 27001 A.5.29, A.10.1; NIST CSF PR.DS-1",
+      "recomendacion": "Crear una política donde se defina que todos los servicios web (internos y externos) del CDA deben utilizar TLS 1.2 o superior, certificados con claves de al menos 2048 bits emitidos por autoridad confiable, y quedar prohibido el uso de TLS 1.0/1.1, claves RSA de 1024 bits y certificados expirados. Esta política debe aplicarse a equipos de red TP-Link, servidores de aplicaciones y cualquier interfaz web usada para la operación del CDA.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    },
+    {
+      "id": "GC_SCAN_01",
+      "control": "Política de uso de cifrado y protocolos seguros",
+      "descripcion": "Definir y documentar una política institucional que especifique los protocolos y algoritmos criptográficos permitidos y prohibidos para los sistemas del CDA.",
+      "categoria": "Gobierno y Cumplimiento",
+      "dominio": "Políticas de seguridad",
+      "referencia": "ISO 27001 A.5.1, A.5.36; NIST CSF ID.GV-1, PR.AC-5",
+      "recomendacion": "Actualizar las políticas de TI del CDA para exigir TLS 1.2/1.3, prohibir TLS 1.0/1.1, SHA-1 y cifrados SSH débiles, e incorporar estas exigencias en los procedimientos de configuración y compra de equipos de red, servidores y aplicaciones.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    }
+  ],
+  "Personas": [],
+  "Proveedores": [
+    {
+      "id": "PV_SCAN_01",
+      "control": "Coordinación con proveedores de infraestructura y software",
+      "descripcion": "Formalizar la coordinación con proveedores de equipos de red y de software de base (bases de datos, servidores de aplicaciones) para asegurar disponibilidad de parches y soporte en temas de seguridad.",
+      "categoria": "Proveedores",
+      "dominio": "Gestión de Relación con Proveedores",
+      "referencia": "ISO 27001 A.5.19, A.5.20; NIST CSF ID.SC-1, ID.SC-4",
+      "recomendacion": "Contactar a los proveedores de los routers TP-Link y de las plataformas que usan MySQL y Tomcat para: 1) confirmar versiones soportadas y fechas de fin de soporte, 2) obtener guías de endurecimiento SSL/TLS y parches recomendados, y 3) establecer un canal regular (correo/portal) para recibir notificaciones de seguridad y actualizaciones, integrándolas en el proceso interno de gestión de parches del CDA.",
+      "madurez": "3",
+      "requires_tags": [
+        "Scan_AI"
+      ]
+    }
+  ],
+  "Fisicos": []
+}
