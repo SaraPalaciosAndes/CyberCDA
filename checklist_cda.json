@@ -1,0 +1,463 @@
+{
+  "Gobierno_y_Cumplimiento": [
+    {
+      "id": "GC01",
+      "control": "Política de tratamiento de datos personales publicada",
+      "descripcion": "El CDA debe contar con una política de tratamiento de datos personales conforme a la Ley 1581 de 2012, publicada y accesible a clientes y empleados.",
+      "categoria": "Gobierno y Cumplimiento",
+      "dominio": "Privacidad y Cumplimiento Legal",
+      "referencia": "Ley 1581 de 2012; ISO 27701 §5.1",
+      "recomendacion": "Publicar la política en un lugar visible, actualizarla anualmente y asegurar que los empleados la conozcan.",
+      "madurez": 2,
+      "requires_tags": []
+    },
+    {
+      "id": "GC02",
+      "control": "Registro de bases de datos en la SIC",
+      "descripcion": "Toda base de datos con información personal debe estar registrada ante la Superintendencia de Industria y Comercio.",
+      "categoria": "Gobierno y Cumplimiento",
+      "dominio": "Privacidad",
+      "referencia": "Ley 1581; Decreto 886 de 2014",
+      "recomendacion": "Registrar o actualizar el RNBD; documentar responsable y finalidades.",
+      "madurez": 2
+    },
+    {
+      "id": "GC03",
+      "control": "Oficial o responsable de seguridad asignado",
+      "descripcion": "Debe existir una persona designada formalmente como responsable de la seguridad de la información.",
+      "categoria": "Gobierno y Cumplimiento",
+      "dominio": "Organización",
+      "referencia": "ISO 27002 §5.2; ISO 27701 §6.1",
+      "recomendacion": "Asignar rol formal y definir funciones.",
+      "madurez": 3,
+      "requires_tags": []
+    },
+    {
+      "id": "GC04",
+      "control": "Matriz de riesgos de seguridad actualizada",
+      "descripcion": "Evaluación de riesgos tecnológicos y de privacidad al menos una vez al año.",
+      "categoria": "Gobierno y Cumplimiento",
+      "dominio": "Gestión de Riesgos",
+      "referencia": "ISO 27005",
+      "recomendacion": "Aplicar metodología sencilla (probabilidad x impacto).",
+      "madurez": 2,
+      "requires_tags": []
+    },
+    {
+      "id": "GC05",
+      "control": "Plan de tratamiento de riesgos",
+      "descripcion": "Documento con acciones, prioridades y responsables para reducir riesgos.",
+      "categoria": "Gobierno y Cumplimiento",
+      "dominio": "Gestión de Riesgos",
+      "referencia": "ISO 27005",
+      "recomendacion": "Definir controles priorizados según impacto.",
+      "madurez": 2,
+      "requires_tags": []
+    },
+    {
+      "id": "GC06",
+      "control": "Procedimiento de gestión de incidentes",
+      "descripcion": "Debe existir un procedimiento documentado para reporte y manejo de incidentes.",
+      "categoria": "Gobierno y Cumplimiento",
+      "dominio": "Continuidad",
+      "referencia": "ISO 27035",
+      "recomendacion": "Asegurar canal de reporte para empleados.",
+      "madurez": 3,
+      "requires_tags": []
+    },
+    {
+      "id": "GC07",
+      "control": "Inventario de activos tecnológicos",
+      "descripcion": "Listado actualizado de equipos, software y dispositivos.",
+      "categoria": "Gobierno y Cumplimiento",
+      "dominio": "Gestión de Activos",
+      "referencia": "ISO 27002 §5.9",
+      "recomendacion": "Incluir responsable, ubicación y criticidad.",
+      "madurez": 2,
+      "requires_tags": []
+    },
+    {
+      "id": "GC08",
+      "control": "Clasificación de información",
+      "descripcion": "Definir niveles de sensibilidad: pública, interna, confidencial.",
+      "categoria": "Gobierno y Cumplimiento",
+      "dominio": "Gestión de Activos",
+      "referencia": "ISO 27002 §5.12",
+      "recomendacion": "Clasificar BD del RUNT, datos técnicos y datos personales.",
+      "madurez": 3,
+      "requires_tags": []
+    },
+    {
+      "id": "GC09",
+      "control": "Contratos con terceros que incluyan cláusulas de seguridad",
+      "descripcion": "Los proveedores deben aceptar cláusulas de confidencialidad y seguridad.",
+      "categoria": "Gobierno y Cumplimiento",
+      "dominio": "Proveedores",
+      "referencia": "ISO 27002 §5.21",
+      "recomendacion": "Firmar anexos de tratamiento de datos.",
+      "madurez": 3,
+      "requires_tags": []
+    },
+    {
+      "id": "GC10",
+      "control": "Plan de continuidad coordinado entre sedes",
+      "descripcion": "Cuando el CDA tiene múltiples sedes, debe existir un plan de continuidad que contemple fallos en una sede y soporte desde otras.",
+      "categoria": "Gobierno y Cumplimiento",
+      "dominio": "Continuidad del Negocio",
+      "referencia": "ISO 22301",
+      "recomendacion": "Definir escenarios de caída de sistemas en una sede y procedimientos para reubicar servicios críticos en otra.",
+      "madurez": 3,
+      "requires_tags": ["MultiSede"]
+    },
+    {
+      "id": "GC11",
+      "control": "Estandarización de configuraciones técnicas entre sedes",
+      "descripcion": "Las sedes deben seguir un estándar común de configuraciones de red y seguridad para facilitar la gestión.",
+      "categoria": "Gobierno y Cumplimiento",
+      "dominio": "Gobierno Técnico",
+      "referencia": "ISO 27002 §5.1",
+      "recomendacion": "Documentar una configuración de referencia para routers, firewalls y redes WiFi y aplicarla en todas las sedes.",
+      "madurez": 3,
+      "requires_tags": ["MultiSede"]
+    },
+
+    {
+      "id": "GC12",
+      "control": "Comité o espacio formal de revisión de seguridad",
+      "descripcion": "En CDAs de mayor tamaño se recomienda establecer un comité o espacio de revisión periódica de asuntos de seguridad y protección de datos.",
+      "categoria": "Gobierno y Cumplimiento",
+      "dominio": "Gobierno de Seguridad",
+      "referencia": "ISO 27001; ISO 27002 §5.2",
+      "recomendacion": "Reunir al menos trimestralmente a responsables de operación, TI y gerencia para revisar incidentes, riesgos y planes de mejora.",
+      "madurez": 3,
+      "requires_tags": ["CDA_Grande"]
+    }
+
+
+  ],
+
+  "Infraestructura_y_Redes": [
+    {
+      "id": "IR01",
+      "control": "Segmentación de red administrativa, operación e IoT",
+      "descripcion": "La red debe estar dividida lógicamente para evitar propagación de infecciones.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Control de Redes",
+      "referencia": "ISO 27002 §8.20; OWASP IoT #7",
+      "recomendacion": "Crear VLAN admin, IoT, equipos de diagnóstico y visitantes.",
+      "madurez": 4,
+      "requires_tags": []
+    },
+    {
+      "id": "IR02",
+      "control": "RDP sin exposición pública",
+      "descripcion": "Ningún puerto 3389 debe estar accesible desde internet.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Control de Acceso",
+      "referencia": "NIST CSF PR.AC",
+      "recomendacion": "Usar VPN y cerrar puertos en firewall.",
+      "madurez": 5,
+      "requires_tags": []
+    },
+    {
+      "id": "IR03",
+      "control": "Routers sin contraseñas por defecto",
+      "descripcion": "Eliminar credenciales de fábrica en routers, AP y firewalls.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Config. Segura",
+      "referencia": "OWASP Secure Config",
+      "recomendacion": "Contraseñas >12 caracteres.",
+      "madurez": 3,
+      "requires_tags": []
+    },
+    {
+      "id": "IR04",
+      "control": "WiFi de invitados aislado",
+      "descripcion": "La red de invitados no debe ver recursos internos.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Control de Redes",
+      "referencia": "ISO 27002 §8.21",
+      "recomendacion": "Modo 'Guest' activado en AP.",
+      "madurez": 3,
+      "requires_tags": []
+    },
+    {
+      "id": "IR05",
+      "control": "Firewall configurado",
+      "descripcion": "Debe existir firewall con reglas documentadas.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Perímetro",
+      "referencia": "NIST CSF PR.AC-5",
+      "recomendacion": "Bloquear todo excepto lo necesario (deny all).",
+      "madurez": 3,
+      "requires_tags": []
+    },
+    {
+      "id": "IR06",
+      "control": "Inventario y segmentación de dispositivos IoT",
+      "descripcion": "El CDA debe mantener un inventario de cámaras IP, DVR y otros dispositivos IoT, asegurando que todos estén ubicados en una VLAN separada de la red administrativa.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "IoT / Segmentación",
+      "referencia": "OWASP IoT Top 10; ISO 27002 §5.9",
+      "recomendacion": "Crear una VLAN exclusiva para CCTV y otros dispositivos IoT, documentar los equipos y restringir el acceso desde redes internas.",
+      "madurez": 3,
+      "requires_tags": ["IoT"]
+    },
+    {
+      "id": "IR07",
+      "control": "Gestión de firmware y credenciales en dispositivos IoT",
+      "descripcion": "Todos los dispositivos IoT deben utilizar firmware actualizado y credenciales diferentes a las de fábrica.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "IoT / Configuración Segura",
+      "referencia": "OWASP IoT Top 10; OWASP Secure Config",
+      "recomendacion": "Establecer una rutina trimestral para revisar actualizaciones y cambiar credenciales por contraseñas robustas.",
+      "madurez": 3,
+      "requires_tags": ["IoT"]
+    },
+    {
+      "id": "IR08",
+      "control": "Inventario de herramientas de acceso remoto",
+      "descripcion": "El CDA debe conocer y documentar todas las herramientas de acceso remoto utilizadas (RDP, TeamViewer, AnyDesk, VPN).",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Acceso Remoto",
+      "referencia": "NIST CSF PR.AC; CIS Controls 12",
+      "recomendacion": "Eliminar herramientas no autorizadas y consolidar el acceso remoto en un único mecanismo controlado.",
+      "madurez": 3,
+      "requires_tags": ["RemoteAccess_Riesgoso"]
+    },
+    {
+      "id": "IR09",
+      "control": "Endurecimiento de accesos remotos administrativos",
+      "descripcion": "Los accesos remotos a servidores o equipos críticos deben requerir autenticación fuerte y estar protegidos detrás de VPN.",
+      "categoria": "Infraestructura y Redes",
+      "dominio": "Acceso Remoto Seguro",
+      "referencia": "NIST CSF PR.AC; ISO 27002 §8.23",
+      "recomendacion": "Deshabilitar RDP expuesto a internet y exigir VPN + contraseña robusta para administradores.",
+      "madurez": 4,
+      "requires_tags": ["RemoteAccess_Riesgoso"]
+    }
+
+
+  ],
+
+  "Equipos_de_Diagnostico": [
+    {
+      "id": "ED01",
+      "control": "Software de diagnóstico actualizado",
+      "descripcion": "El software debe contar con la versión más reciente aprobada.",
+      "categoria": "Equipos de Diagnóstico",
+      "dominio": "Software Crítico",
+      "referencia": "Buenas prácticas industria; ISO 27002 §8.9",
+      "recomendacion": "Coordinar con proveedor para parches.",
+      "madurez": 3,
+      "requires_tags": []
+    },
+    {
+      "id": "ED02",
+      "control": "Control de acceso al software de diagnóstico",
+      "descripcion": "Solo personal autorizado debe operar el software.",
+      "categoria": "Equipos de Diagnóstico",
+      "dominio": "Control de Acceso",
+      "referencia": "ISO 27002 §5.15",
+      "recomendacion": "Usuarios únicos, sin contraseñas compartidas.",
+      "madurez": 4,
+      "requires_tags": []
+    },
+    {
+      "id": "ED03",
+      "control": "Aislamiento en VLAN dedicada",
+      "descripcion": "Los equipos de diagnóstico deben estar en una red separada.",
+      "categoria": "Equipos de Diagnóstico",
+      "dominio": "Redes",
+      "referencia": "ISO 27002 §8.20",
+      "recomendacion": "Evitar mezclar admin + diagnóstico.",
+      "madurez": 4,
+      "requires_tags": []
+    }
+  ],
+
+  "Aplicativos_y_Datos": [
+    {
+      "id": "AD01",
+      "control": "Cifrado de bases de datos",
+      "descripcion": "La BD local debe estar cifrada o protegida de acceso externo.",
+      "categoria": "Aplicativos y Datos",
+      "dominio": "Protección de Datos",
+      "referencia": "ISO 27002 §8.24",
+      "recomendacion": "Usar cifrado AES-256 o equivalente.",
+      "madurez": 4,
+      "requires_tags": []
+    },
+    {
+      "id": "AD02",
+      "control": "Backups diarios",
+      "descripcion": "Los datos deben respaldarse en un medio separado.",
+      "categoria": "Aplicativos y Datos",
+      "dominio": "Continuidad",
+      "referencia": "ISO 22301",
+      "recomendacion": "Rotación 3-2-1.",
+      "madurez": 3,
+      "requires_tags": []
+    },
+    {
+      "id": "AD03",
+      "control": "Política de desarrollo seguro para software propio",
+      "descripcion": "Si el CDA desarrolla o modifica su propio software de diagnóstico, debe contar con lineamientos mínimos de desarrollo seguro.",
+      "categoria": "Aplicativos y Datos",
+      "dominio": "Desarrollo Seguro",
+      "referencia": "OWASP ASVS; ISO 27002 §8.25",
+      "recomendacion": "Definir un checklist básico de seguridad para nuevas versiones del software, incluyendo validación de entradas y gestión de errores.",
+      "madurez": 3,
+      "requires_tags": ["Software_Propio"]
+    },
+    {
+      "id": "AD04",
+      "control": "Revisión de seguridad y pruebas para software propio",
+      "descripcion": "Las nuevas versiones del software propio deben ser revisadas y probadas con foco en seguridad antes de su despliegue.",
+      "categoria": "Aplicativos y Datos",
+      "dominio": "Pruebas de Seguridad",
+      "referencia": "OWASP ASVS; ENISA Secure Software",
+      "recomendacion": "Realizar pruebas de caja negra básicas y revisar funciones críticas que manipulan datos personales o técnicos de las revisiones vehiculares.",
+      "madurez": 4,
+      "requires_tags": ["Software_Propio"]
+    },
+    {
+      "id": "AD05",
+      "control": "Inventario de servicios en la nube",
+      "descripcion": "El CDA debe mantener un inventario de todos los servicios en la nube usados para almacenamiento o procesamiento de datos.",
+      "categoria": "Aplicativos y Datos",
+      "dominio": "Gestión de Activos en la Nube",
+      "referencia": "ISO 27017; ISO 27018",
+      "recomendacion": "Documentar proveedores, tipo de datos almacenados y ubicación (país/región) del almacenamiento.",
+      "madurez": 3,
+      "requires_tags": ["Cloud"]
+    },
+    {
+      "id": "AD06",
+      "control": "Gestión de accesos y permisos en la nube",
+      "descripcion": "Los servicios en la nube deben contar con control de acceso basado en roles y, cuando sea posible, autenticación multifactor.",
+      "categoria": "Aplicativos y Datos",
+      "dominio": "Control de Acceso / Nube",
+      "referencia": "ISO 27017; NIST CSF PR.AC",
+      "recomendacion": "Asignar roles específicos para administración, soporte y uso normal, limitando privilegios y activando MFA para cuentas administrativas.",
+      "madurez": 4,
+      "requires_tags": ["Cloud"]
+    },
+    {
+      "id": "AD07",
+      "control": "Centralización básica de logs",
+      "descripcion": "Los logs de sistemas críticos deben centralizarse en un único equipo o servicio para facilitar su revisión.",
+      "categoria": "Aplicativos y Datos",
+      "dominio": "Monitoreo",
+      "referencia": "ISO 27002 §8.15",
+      "recomendacion": "Configurar una máquina central que reciba los logs de acceso y eventos importantes.",
+      "madurez": 3,
+      "requires_tags": ["Logs"]
+    },
+    {
+      "id": "AD08",
+      "control": "Revisión periódica de logs",
+      "descripcion": "Debe existir una rutina para revisar logs de accesos, fallos y cambios relevantes.",
+      "categoria": "Aplicativos y Datos",
+      "dominio": "Monitoreo / Detección",
+      "referencia": "NIST CSF DE.AE; ISO 27002 §8.16",
+      "recomendacion": "Definir frecuencia (por ejemplo mensual) y responsable para revisar logs de intentos fallidos y accesos fuera de horario.",
+      "madurez": 3,
+      "requires_tags": ["Logs"]
+    }
+
+
+
+  ],
+
+  "Personas": [
+    {
+      "id": "PE01",
+      "control": "Capacitación anual en seguridad digital",
+      "descripcion": "Todos los empleados deben recibir formación básica.",
+      "categoria": "Personas",
+      "dominio": "Concienciación",
+      "referencia": "ISO 27002 §6.3",
+      "recomendacion": "Incluye phishing, datos personales y ransomware.",
+      "madurez": 2,
+      "requires_tags": []
+    },
+    {
+      "id": "PE02",
+      "control": "Procedimiento formal de alta, modificación y baja de usuarios",
+      "descripcion": "El CDA debe contar con un procedimiento documentado para crear, modificar y eliminar usuarios de sistemas críticos.",
+      "categoria": "Personas",
+      "dominio": "Gestión de Identidades",
+      "referencia": "ISO 27002 §5.15",
+      "recomendacion": "Utilizar formularios o tickets para solicitar creación y revocación de accesos, con aprobación del responsable.",
+      "madurez": 3,
+      "requires_tags": ["GestiónIdentidades"]
+    }
+
+  ],
+
+  "Proveedores": [
+    {
+      "id": "PV01",
+      "control": "Evaluación de seguridad del proveedor tecnológico",
+      "descripcion": "El CDA debe verificar la seguridad del software que usa.",
+      "categoria": "Proveedores",
+      "dominio": "Terceros",
+      "referencia": "ISO 27002 §5.21",
+      "recomendacion": "Solicitar declaración de seguridad.",
+      "madurez": 3,
+      "requires_tags": []
+    },
+
+    {
+      "id": "PV02",
+      "control": "Plan de contingencia ante fallo del proveedor principal",
+      "descripcion": "Cuando existe alta dependencia de un único proveedor tecnológico, el CDA debe tener un plan para continuar operando ante su indisponibilidad.",
+      "categoria": "Proveedores",
+      "dominio": "Riesgo de Terceros",
+      "referencia": "ISO 27036; NIST CSF ID.SC",
+      "recomendacion": "Identificar alternativas mínimas (plan B) en caso de que el proveedor principal no pueda prestar el servicio.",
+      "madurez": 3,
+      "requires_tags": ["SingleVendorRisk"]
+    },
+    {
+      "id": "PV03",
+      "control": "Revisión anual de la dependencia del proveedor",
+      "descripcion": "La dependencia del proveedor principal debe revisarse al menos una vez al año.",
+      "categoria": "Proveedores",
+      "dominio": "Riesgo de Terceros",
+      "referencia": "ISO 27036",
+      "recomendacion": "Analizar impactos de interrupciones prolongadas del proveedor y documentar acciones mitigantes.",
+      "madurez": 2,
+      "requires_tags": ["SingleVendorRisk"]
+    }
+
+  ],
+
+  "Fisicos": [
+    {
+      "id": "FS01",
+      "control": "CCTV funcionando y protegido",
+      "descripcion": "Las cámaras deben grabar, con acceso restringido.",
+      "categoria": "Físicos",
+      "dominio": "Seguridad Física",
+      "referencia": "ISO 27002 §7.4",
+      "recomendacion": "Clave única, DVR protegido.",
+      "madurez": 3,
+      "requires_tags": []
+    },
+    {
+      "id": "FS02",
+      "control": "Protección física específica de DVR y grabadores",
+      "descripcion": "Los DVR y grabadores de video deben estar en gabinetes cerrados o salas restringidas para evitar manipulación o robo de evidencia.",
+      "categoria": "Físicos",
+      "dominio": "Seguridad Física / IoT",
+      "referencia": "ISO 27002 §7.4",
+      "recomendacion": "Instalar los DVR en un cuarto técnico con acceso controlado y registro de ingreso.",
+      "madurez": 3,
+      "requires_tags": ["IoT"]
+    }
+
+  ]
+}
+

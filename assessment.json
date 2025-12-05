@@ -1,0 +1,355 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "nombre": "Assessment de caracterización del CDA",
+    "descripcion": "Cuestionario para personalizar el checklist de ciberseguridad según las características del Centro de Diagnóstico Automotor.",
+    "autor": "Proyecto Marco de Ciberseguridad para CDA",
+    "ultima_actualizacion": "2025-11-25"
+  },
+  "sections": [
+    {
+      "id": "CTX",
+      "titulo": "Contexto general del CDA",
+      "descripcion": "Información básica del CDA que influye en el nivel de criticidad y en el tamaño del checklist.",
+      "questions": [
+        {
+          "id": "CTX01",
+          "texto": "¿Cuál es el tamaño del CDA según número de empleados?",
+          "ayuda": "Incluya personal administrativo, técnico y de apoyo.",
+          "tipo": "single_choice",
+          "opciones": ["Pequeño (1-10)", "Mediano (11-30)", "Grande (31 o más)"],
+          "peso": 1,
+          "impacts": [
+            {
+              "tipo": "tag",
+              "valor": "CDA_Pequeño",
+              "efecto": "bajar_prioridad_controles_avanzados"
+            },
+            {
+              "tipo": "tag",
+              "valor": "CDA_Grande",
+              "condicion": "respuesta == 'Grande (31 o más)'",
+              "efecto": "activar_controles_gobierno_avanzados"
+            }
+          ]
+        },
+        {
+          "id": "CTX02",
+          "texto": "¿Cuántas sedes físicas de operación tiene el CDA?",
+          "ayuda": "Incluya sedes satélite o puntos de atención que utilicen el mismo sistema.",
+          "tipo": "number",
+          "unidad": "sedes",
+          "peso": 2,
+          "impacts": [
+            {
+              "tipo": "tag",
+              "valor": "MultiSede",
+              "condicion": "valor >= 2",
+              "efecto": "activar_controles_continuidad_y_coordinacion"
+            }
+          ]
+        },
+        {
+          "id": "CTX03",
+          "texto": "¿Qué nivel de dependencia tiene el CDA de los sistemas informáticos para operar?",
+          "ayuda": "Bajo: muchos procesos son manuales. Alto: casi todo depende de sistemas.",
+          "tipo": "single_choice",
+          "opciones": ["Bajo", "Medio", "Alto"],
+          "peso": 2,
+          "impacts": [
+            {
+              "tipo": "control",
+              "control_id": "AD02",
+              "condicion": "respuesta == 'Alto'",
+              "efecto": "aumentar_madurez",
+              "valor": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "NET",
+      "titulo": "Arquitectura de red e infraestructura",
+      "descripcion": "Características de la red, segmentación, WiFi e IoT.",
+      "questions": [
+        {
+          "id": "NET01",
+          "texto": "¿Cuenta el CDA con segmentación lógica de red (VLAN) actualmente?",
+          "ayuda": "Por ejemplo: red administrativa, red de equipos de diagnóstico, red de invitados, IoT.",
+          "tipo": "single_choice",
+          "opciones": ["No", "Parcial", "Sí"],
+          "peso": 3,
+          "impacts": [
+            {
+              "tipo": "control",
+              "control_id": "IR01",
+              "condicion": "respuesta == 'No'",
+              "efecto": "aumentar_prioridad",
+              "valor": 2
+            },
+            {
+              "tipo": "tag",
+              "valor": "Segmentation_Missing",
+              "condicion": "respuesta == 'No'",
+              "efecto": "marcar_riesgo_alto"
+            }
+          ]
+        },
+        {
+          "id": "NET02",
+          "texto": "¿Existe red WiFi para invitados?",
+          "ayuda": "Red utilizada por clientes o dispositivos personales.",
+          "tipo": "single_choice",
+          "opciones": ["No", "Sí, en la misma red interna", "Sí, aislada de la red interna"],
+          "peso": 2,
+          "impacts": [
+            {
+              "tipo": "control",
+              "control_id": "IR04",
+              "condicion": "respuesta == 'Sí, en la misma red interna'",
+              "efecto": "aumentar_madurez",
+              "valor": 1
+            },
+            {
+              "tipo": "control",
+              "control_id": "IR01",
+              "condicion": "respuesta == 'Sí, en la misma red interna'",
+              "efecto": "aumentar_prioridad",
+              "valor": 1
+            }
+          ]
+        },
+        {
+          "id": "NET03",
+          "texto": "¿Se utilizan accesos remotos a equipos internos (RDP, TeamViewer, AnyDesk, VPN)?",
+          "ayuda": "Seleccione todas las opciones que apliquen.",
+          "tipo": "multi_choice",
+          "opciones": ["Ninguno", "RDP expuesto", "RDP por VPN", "TeamViewer", "AnyDesk", "Otra VPN corporativa"],
+          "peso": 3,
+          "impacts": [
+            {
+              "tipo": "control",
+              "control_id": "IR02",
+              "condicion": "contiene('RDP expuesto')",
+              "efecto": "aumentar_madurez",
+              "valor": 2
+            },
+            {
+              "tipo": "tag",
+              "valor": "RemoteAccess_Riesgoso",
+              "condicion": "contiene('RDP expuesto') or contiene('TeamViewer') or contiene('AnyDesk')",
+              "efecto": "activar_controles_remote_access"
+            }
+          ]
+        },
+        {
+          "id": "NET04",
+          "texto": "¿El CDA utiliza cámaras IP, DVR u otros dispositivos IoT conectados a la red?",
+          "ayuda": "Incluye CCTV, sensores, lectores, etc.",
+          "tipo": "single_choice",
+          "opciones": ["No", "Sí, en la misma red administrativa", "Sí, en red/vlan separada"],
+          "peso": 3,
+          "impacts": [
+            {
+              "tipo": "tag",
+              "valor": "IoT",
+              "condicion": "respuesta != 'No'",
+              "efecto": "activar_controles_iot"
+            },
+            {
+              "tipo": "control",
+              "control_id": "FS01",
+              "condicion": "respuesta != 'No'",
+              "efecto": "aumentar_madurez",
+              "valor": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "APP",
+      "titulo": "Aplicativos, datos y sistemas críticos",
+      "descripcion": "Información sobre el software de diagnóstico, RUNT, bases de datos y backups.",
+      "questions": [
+        {
+          "id": "APP01",
+          "texto": "¿El software de diagnóstico es propio del CDA o provisto por un tercero?",
+          "ayuda": "Propio: desarrollado o mantenido internamente. Tercero: proveedor externo.",
+          "tipo": "single_choice",
+          "opciones": ["Propio", "Proveedor nacional", "Proveedor internacional"],
+          "peso": 2,
+          "impacts": [
+            {
+              "tipo": "tag",
+              "valor": "Software_Propio",
+              "condicion": "respuesta == 'Propio'",
+              "efecto": "activar_controles_desarrollo_seguro"
+            },
+            {
+              "tipo": "control",
+              "control_id": "PV01",
+              "condicion": "respuesta != 'Propio'",
+              "efecto": "aumentar_madurez",
+              "valor": 1
+            }
+          ]
+        },
+        {
+          "id": "APP02",
+          "texto": "¿Dónde se almacenan los datos técnicos y personales del CDA?",
+          "ayuda": "Indique la opción que mejor represente su realidad.",
+          "tipo": "single_choice",
+          "opciones": ["Solo en equipos locales", "En servidor local centralizado", "En nube del proveedor", "Híbrido (local + nube)"],
+          "peso": 3,
+          "impacts": [
+            {
+              "tipo": "control",
+              "control_id": "AD01",
+              "condicion": "respuesta == 'Solo en equipos locales' or respuesta == 'En servidor local centralizado'",
+              "efecto": "aumentar_prioridad",
+              "valor": 2
+            },
+            {
+              "tipo": "tag",
+              "valor": "Cloud",
+              "condicion": "respuesta == 'En nube del proveedor' or respuesta == 'Híbrido (local + nube)'",
+              "efecto": "activar_controles_cloud"
+            }
+          ]
+        },
+        {
+          "id": "APP03",
+          "texto": "¿Se realizan copias de seguridad de la información crítica?",
+          "ayuda": "Considere BD, informes de revisión, logs y configuraciones.",
+          "tipo": "single_choice",
+          "opciones": ["No se realizan", "Ocasionalmente, sin procedimiento", "Sí, con procedimiento formal"],
+          "peso": 3,
+          "impacts": [
+            {
+              "tipo": "control",
+              "control_id": "AD02",
+              "condicion": "respuesta == 'No se realizan'",
+              "efecto": "aumentar_madurez",
+              "valor": 2
+            }
+          ]
+        },
+        {
+          "id": "APP04",
+          "texto": "¿Se utiliza algún mecanismo de registro o log de accesos al sistema?",
+          "ayuda": "Incluya logs de inicio de sesión, cambios y operaciones críticas.",
+          "tipo": "single_choice",
+          "opciones": ["No", "Parcial / no centralizado", "Sí, con revisión periódica"],
+          "peso": 2,
+          "impacts": [
+            {
+              "tipo": "tag",
+              "valor": "Logs",
+              "condicion": "respuesta != 'No'",
+              "efecto": "reducir_riesgo_incidentes_no_detectados"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PE",
+      "titulo": "Personas y procesos",
+      "descripcion": "Aspectos relacionados con cultura de seguridad, roles y capacitación.",
+      "questions": [
+        {
+          "id": "PE01",
+          "texto": "¿Existe un responsable asignado para protección de datos personales (habeas data)?",
+          "ayuda": "Puede ser la misma persona que lidera la seguridad o un rol específico.",
+          "tipo": "single_choice",
+          "opciones": ["No", "Sí, de manera informal", "Sí, formalmente designado"],
+          "peso": 2,
+          "impacts": [
+            {
+              "tipo": "control",
+              "control_id": "GC03",
+              "condicion": "respuesta == 'No'",
+              "efecto": "aumentar_madurez",
+              "valor": 1
+            }
+          ]
+        },
+        {
+          "id": "PE02",
+          "texto": "¿Se realizan capacitaciones en ciberseguridad al personal?",
+          "ayuda": "Temas como phishing, contraseñas, uso seguro de sistemas y protección de datos.",
+          "tipo": "single_choice",
+          "opciones": ["Nunca", "Ocasionalmente", "Al menos una vez al año"],
+          "peso": 3,
+          "impacts": [
+            {
+              "tipo": "control",
+              "control_id": "PE01",
+              "condicion": "respuesta == 'Nunca'",
+              "efecto": "aumentar_madurez",
+              "valor": 2
+            }
+          ]
+        },
+        {
+          "id": "PE03",
+          "texto": "¿Se aplican procesos formales de ingreso y salida de personal (onboarding/offboarding)?",
+          "ayuda": "Por ejemplo, entrega y revocación de usuarios, llaves, tarjetas, accesos.",
+          "tipo": "single_choice",
+          "opciones": ["No", "Parcial", "Sí"],
+          "peso": 2,
+          "impacts": [
+            {
+              "tipo": "tag",
+              "valor": "GestiónIdentidades",
+              "condicion": "respuesta != 'No'",
+              "efecto": "reducir_riesgo_acceso_ex_empleados"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PV",
+      "titulo": "Proveedores y entorno externo",
+      "descripcion": "Relación con proveedores de software, nube y servicios críticos.",
+      "questions": [
+        {
+          "id": "PV01",
+          "texto": "¿Cuenta el CDA con acuerdos o contratos que incluyan cláusulas de seguridad con sus proveedores de TI?",
+          "ayuda": "Incluye proveedor de software de diagnóstico, nube o soporte técnico.",
+          "tipo": "single_choice",
+          "opciones": ["No", "En negociación", "Sí"],
+          "peso": 2,
+          "impacts": [
+            {
+              "tipo": "control",
+              "control_id": "PV01",
+              "condicion": "respuesta == 'No'",
+              "efecto": "aumentar_madurez",
+              "valor": 1
+            }
+          ]
+        },
+        {
+          "id": "PV02",
+          "texto": "¿Qué tan dependiente es el CDA de un único proveedor tecnológico?",
+          "ayuda": "Por ejemplo, un solo proveedor para software, base de datos y soporte.",
+          "tipo": "single_choice",
+          "opciones": ["Baja dependencia", "Media", "Alta dependencia"],
+          "peso": 2,
+          "impacts": [
+            {
+              "tipo": "tag",
+              "valor": "SingleVendorRisk",
+              "condicion": "respuesta == 'Alta dependencia'",
+              "efecto": "activar_controles_continuidad_y_salida_proveedor"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
