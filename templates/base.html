@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>CyberCDA - {% block title %}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🛡️</div>
+      <div class="logo-text">CyberCDA</div>
+    </div>
+     <nav class="sidebar-menu">
+    <a href="{{ url_for('dashboard') }}"
+       class="sidebar-item {% if active_page == 'dashboard' %}sidebar-item-active{% endif %}">
+      Dashboard
+    </a>
+
+    <a href="{{ url_for('checklist') }}"
+       class="sidebar-item {% if active_page == 'checklist' %}sidebar-item-active{% endif %}">
+      Checklist Detallado
+    </a>
+
+    <a href="{{ url_for('assessment') }}"
+       class="sidebar-item {% if active_page == 'assessment' %}sidebar-item-active{% endif %}">
+      Assessment
+    </a>
+
+    <a href="{{ url_for('import_scan') }}"
+       class="sidebar-item {% if active_page == 'alerts' %}sidebar-item-active{% endif %}">
+      Importar Escaneos
+    </a>
+
+  </nav>
+  </aside>
+
+  <main class="main">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+</body>
+</html>
