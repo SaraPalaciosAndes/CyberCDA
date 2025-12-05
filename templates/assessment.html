@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Evaluación de Ciberseguridad{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1>Evaluación de Cibersegeguridad para el CDA</h1>
+    <div class="subheader">
+      Completa esta evaluación para personalizar el checklist de seguridad para tu organización.
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="chip">CDA: {{ cda_name }}</span>
+    <span class="step-indicator">Paso 1 de 2 · Assessment → Checklist</span>
+  </div>
+</div>
+
+<form method="POST">
+  <div class="page-body">
+
+    <!-- Columna izquierda: secciones y preguntas -->
+    <section class="content-main">
+
+      {% for section in sections %}
+        <div class="card assessment-section-card">
+          <div class="section-header">
+            <div class="section-icon">
+              <span>🛡️</span>
+            </div>
+            <div>
+              <div class="section-title">{{ section.titulo }}</div>
+              {% if section.descripcion %}
+                <div class="section-subtitle">{{ section.descripcion }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="section-body">
+            {% for q in section.questions %}
+              <div class="question-block">
+                <label class="question-label" for="{{ q.id }}">
+                  {{ q.texto }}
+                </label>
+                {% if q.ayuda %}
+                  <div class="question-help">
+                    {{ q.ayuda }}
+                  </div>
+                {% endif %}
+
+                {% set qtype = q.tipo %}
+                {% set name = q.id %}
+                {% set saved = saved_answers.get(name) %}
+
+                {% if qtype == "single_choice" %}
+                  <div class="option-group">
+                    {% for opt in q.opciones %}
+                      <label class="option-chip">
+                        <input
+                          type="radio"
+                          name="{{ name }}"
+                          value="{{ opt }}"
+                          {% if saved == opt %}checked{% endif %}
+                        >
+                        <span>{{ opt }}</span>
+                      </label>
+                    {% endfor %}
+                  </div>
+
+                {% elif qtype == "multi_choice" %}
+                  {% set saved_list = saved or [] %}
+                  <div class="option-group">
+                    {% for opt in q.opciones %}
+                      <label class="option-chip">
+                        <input
+                          type="checkbox"
+                          name="{{ name }}"
+                          value="{{ opt }}"
+                          {% if opt in saved_list %}checked{% endif %}
+                        >
+                        <span>{{ opt }}</span>
+                      </label>
+                    {% endfor %}
+                  </div>
+
+                {% elif qtype == "number" %}
+                  <input
+                    type="number"
+                    id="{{ name }}"
+                    name="{{ name }}"
+                    class="input-field"
+                    value="{{ saved or '' }}"
+                    placeholder="Ej: 2"
+                  >
+
+                {% else %}
+                  <input
+                    type="text"
+                    id="{{ name }}"
+                    name="{{ name }}"
+                    class="input-field"
+                    value="{{ saved or '' }}"
+                  >
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+
+    </section>
+
+    <!-- Columna derecha: Summary + acciones -->
+    <aside class="content-detail">
+      <div class="card summary-card">
+        <div class="summary-title">Resumen del Assessment</div>
+        <p class="summary-text">
+          Tus respuestas se usarán para adaptar el checklist de ciberseguridad
+          a las características específicas del CDA.
+        </p>
+
+        <div class="summary-progress-label">Progreso</div>
+        <div class="summary-progress-bar">
+          <div class="summary-progress-inner" style="width: {{ progress_pct }}%;"></div>
+        </div>
+        <div class="summary-progress-text">
+          {{ answered_count }} de {{ total_questions }} preguntas respondidas
+        </div>
+
+        <div class="summary-tags-label">Tags de perfil detectados (ejemplo)</div>
+        <div class="summary-tags">
+          <span class="tag-chip">IoT</span>
+          <span class="tag-chip">Nube</span>
+          <span class="tag-chip">Multisede</span>
+        </div>
+
+        <button type="submit" class="btn-primary full-width">
+          Guardar y continuar al Checklist
+        </button>
+
+        <a href="{{ url_for('assessment_reset') }}" class="btn-tertiary full-width" style="text-align:center; display:block; margin-top:8px;">
+          Reiniciar Assessment
+        </a>
+
+        <button type="button" class="btn-secondary full-width">
+          Cancelar y volver al inicio
+        </button>
+      </div>
+
+      <div class="card info-card">
+        <div class="info-title">¿Por qué es importante?</div>
+        <p class="info-text">
+          Respuestas precisas aseguran que no te carguemos con controles de seguridad irrelevantes.
+          Por ejemplo, si tu CDA no tiene dispositivos IoT, no te pediremos controles relacionados con IoT.
+        </p>
+      </div>
+    </aside>
+
+  </div>
+</form>
+
+{% endblock %}

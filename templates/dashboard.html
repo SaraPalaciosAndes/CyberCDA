@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+{% block title %}Panel de Seguridad{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1>Panel de Seguridad del CDA</h1>
+    <div class="subheader">
+      Estado general del cumplimiento y alertas de seguridad.
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <section class="content-main">
+
+    <div class="dashboard-top-row">
+
+      <div class="card card-kpi kpi-cumplimiento">
+        <div class="kpi-header">Nivel de Cumplimiento</div>
+        <div class="kpi-gauge-wrapper">
+          <div class="kpi-gauge">
+            <div class="kpi-gauge-inner {{ risk_class }}">
+              <div class="kpi-gauge-value">
+                {{ compliance }}%
+              </div>
+              <div class="kpi-gauge-label">
+                {{ risk_label }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="kpi-footer">
+          {% if risk_class == 'high' %}
+            Se requiere atención inmediata en controles de acceso e infraestructura.
+          {% elif risk_class == 'medium' %}
+            Existen riesgos moderados que deben atenderse en el corto plazo.
+          {% else %}
+            El CDA presenta un nivel de cumplimiento adecuado. Mantener la mejora continua.
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card card-kpi">
+        <div class="kpi-header">Controles críticos</div>
+        <div class="kpi-main">
+          <span class="kpi-number">{{ critical_count }}</span>
+          <span class="kpi-subtext">Sin cumplir</span>
+        </div>
+        <div class="kpi-footer kpi-footer-muted">
+          Considera priorizar estos controles en el plan de acción.
+        </div>
+      </div>
+
+      <div class="card card-kpi">
+        <div class="kpi-header">Alertas activas</div>
+        <div class="kpi-main">
+          <span class="kpi-number">{{ alerts_count }}</span>
+          <span class="kpi-subtext">Requieren revisión</span>
+        </div>
+        <div class="kpi-footer kpi-footer-muted">
+          Corresponden a hallazgos recientes de seguridad.
+        </div>
+      </div>
+
+      <div class="card card-kpi">
+        <div class="kpi-header">Último escaneo</div>
+        <div class="kpi-main">
+          <span class="kpi-number-small">{{ last_scan_label }}</span>
+        </div>
+        <div class="kpi-footer kpi-footer-muted">
+          Escaneo realizado automáticamente según la configuración del sistema.
+        </div>
+      </div>
+
+    </div>
+
+    {% if risk_class == 'high' %}
+      <div class="card card-warning">
+        <div class="warning-icon">⚠️</div>
+        <div class="warning-body">
+          <div class="warning-title">Atención requerida</div>
+          <div class="warning-text">
+            El sistema ha detectado vulnerabilidades críticas que requieren acción inmediata.
+            Se recomienda revisar los controles de infraestructura, accesos remotos y protección de datos.
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="card card-lista">
+      <div class="card-lista-header">
+        <div class="card-lista-title">
+          Lista de Verificación
+        </div>
+        <div class="card-lista-progress">
+          Progreso:
+          <span class="card-lista-progress-value">
+            {{ compliance }}%
+          </span>
+        </div>
+      </div>
+
+      <div class="lista-categorias">
+
+        {% for categoria, info in category_stats.items() %}
+            <div class="lista-categoria">
+                <div class="lista-categoria-header">
+                <div class="lista-categoria-titulo">
+                    {{ categoria }}
+                </div>
+                <div class="lista-categoria-progress">
+                    <div class="mini-bar">
+                    <div class="mini-bar-inner {{ info.risk_class }}" style="width: {{ info.perc }}%;"></div>
+                    </div>
+                    <span class="mini-bar-label">
+                    {{ info.implemented }}/{{ info.total }} ({{ info.perc }}%)
+                    </span>
+                </div>
+                </div>
+
+                <div class="lista-categoria-body">
+                {% set pendientes = pending_by_category.get(categoria, []) %}
+
+                {% if pendientes %}
+                    {% for c in pendientes[:3] %}
+                    <div class="lista-control-item">
+                        <input
+                        type="checkbox"
+                        disabled
+                        >
+                        <span class="lista-control-text">
+                        {{ c.control }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                    {% if pendientes|length > 3 %}
+                    <div class="lista-control-more">
+                        + {{ pendientes|length - 3 }} controles pendientes adicionales…
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="lista-control-more">
+                    ✅ Todos los controles de esta categoría están cumplidos.
+                    </div>
+                {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+
+      </div>
+    </div>
+
+  </section>
+
+  <aside class="content-detail">
+
+    <div class="card card-alertas">
+      <div class="detail-title">Alertas críticas</div>
+      <div class="alertas-list">
+        {% for alert in critical_alerts %}
+          <div class="alert-card">
+            <div class="alert-icon">✖</div>
+            <div class="alert-body">
+              <div class="alert-title">{{ alert.titulo }}</div>
+              <div class="alert-text">{{ alert.detalle }}</div>
+              <a
+                class="alert-link"
+                href="{{ url_for('checklist', control_id=alert.control_id, from_alert=1) }}"
+                >
+                Ver detalles
+                </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card card-recomendaciones">
+    <div class="detail-title">Recomendaciones</div>
+    <div class="recomendaciones-list">
+        {% if recomendaciones %}
+        {% for rec in recomendaciones %}
+            <div class="recomendacion-card">
+            <div class="recomendacion-header">
+                <div class="recomendacion-titulo">{{ rec.titulo }}</div>
+                <div class="recomendacion-tags">
+                <span class="tag-impacto 
+                {% if rec.prioridad == 'ALTA PRIORIDAD' %}impacto-alto
+                {% elif rec.prioridad == 'PRIORIDAD MEDIA' %}impacto-medio
+                {% else %}impacto-bajo
+                {% endif %}
+            ">
+            {{ rec.prioridad }}
+            </span>
+                <span class="tag-origen">Checklist</span>
+                </div>
+            </div>
+            <div class="recomendacion-text">
+                {{ rec.detalle }}
+            </div>
+            </div>
+        {% endfor %}
+        {% else %}
+        <div class="recomendacion-text" style="font-size:13px; color:#6b7280;">
+            No hay recomendaciones pendientes: todos los controles del checklist están cumplidos.
+        </div>
+        {% endif %}
+    </div>
+    </div>
+
+  </aside>
+
+</div>
+
+{% endblock %}

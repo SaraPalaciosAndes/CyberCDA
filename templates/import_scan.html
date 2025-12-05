@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Importar escaneo{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Importar resultados de escaneo</h1>
+    <div class="subheader">
+      Sube un archivo de Nmap u OpenVAS para generar recomendaciones con IA.
+    </div>
+  </div>
+</div>
+
+<form method="POST" enctype="multipart/form-data">
+  <div class="page-body">
+    <section class="content-main">
+      <div class="card">
+        <h2 class="section-title">Subir archivo de escaneo</h2>
+
+        {% if error %}
+          <div style="color:#b91c1c; font-size:13px; margin-bottom:8px;">
+            {{ error }}
+          </div>
+        {% endif %}
+
+        <div style="margin-bottom:10px;">
+          <label class="question-label">Archivo de escaneo (PDF, XML, JSON)</label>
+          <input type="file" name="scan_file" accept=".pdf,.xml,.json">
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label class="question-label">Tipo de escaneo</label>
+          <select name="scan_type" class="input-field">
+            <option value="Nmap">Nmap scan</option>
+            <option value="OpenVAS">OpenVAS report</option>
+            <option value="Other">Other security tool</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label class="question-label">Fecha del escaneo</label>
+          <input type="date" name="scan_date" class="input-field">
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label class="question-label">Nombre o referencia del escaneo</label>
+          <input type="text" name="scan_name" class="input-field" placeholder="Ej: Nmap LAN interna – Marzo 2025">
+        </div>
+
+        <button type="submit" class="btn-primary">
+          Subir y analizar con IA
+        </button>
+      </div>
+
+{% if ai_controls %}
+  <div class="card" style="margin-top:16px;">
+    <h2 class="section-title">Controles sugeridos por IA (vista previa)</h2>
+    <p style="font-size:13px; color:#4b5563; margin-bottom:10px;">
+      A continuación se muestran los últimos controles generados por la IA a partir del escaneo.
+      Esta vista previa resume los hallazgos más recientes.
+    </p>
+
+    {% if ai_preview_controls %}
+      <div class="ai-controls-preview" style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
+        {% for c in ai_preview_controls %}
+          <div class="ai-control-card" style="border:1px solid #e5e7eb; border-radius:8px; padding:8px 10px; background:#f9fafb;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="font-weight:600; font-size:13px;">
+                {{ c.control or 'Control sin título' }}
+              </div>
+              {% if c.madurez %}
+                <span style="font-size:11px; padding:2px 6px; border-radius:999px; background:#eef2ff; color:#4f46e5;">
+                  Madurez objetivo: {{ c.madurez }}/5
+                </span>
+              {% endif %}
+            </div>
+            <div style="font-size:12px; color:#4b5563; margin-top:4px;">
+              <strong>Categoría:</strong> {{ c.categoria }}{% if c.dominio %} · <strong>Dominio:</strong> {{ c.dominio }}{% endif %}
+            </div>
+            {% if c.referencia %}
+              <div style="font-size:11px; color:#6b7280; margin-top:2px;">
+                Ref: {{ c.referencia }}
+              </div>
+            {% endif %}
+            {% if c.recomendacion %}
+              <div style="font-size:12px; color:#374151; margin-top:4px;">
+                <strong>Recomendación:</strong> {{ c.recomendacion }}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="font-size:13px; color:#6b7280; margin-bottom:12px;">
+        No se encontraron controles específicos en esta ejecución.
+      </p>
+    {% endif %}
+
+
+  </div>
+{% endif %}
+    </section>
+
+   
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}Checklist Detallado{% endblock %}
+
+{% block content %}
+<form method="POST">  
+
+<div class="page-header">
+  <div>
+    <h1>Checklist Detallado</h1>
+    <div class="subheader">
+      Evaluación del CDA: <strong>{{ cda_name }}</strong> · {{ eval_date }}
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn-secondary" type="submit">Guardar cambios</button>
+    <button class="btn-primary" type="button">Generar reporte PDF</button>
+  </div>
+</div>
+
+{% if from_alert and selected_control %}
+  <div class="alert-banner">
+    Mostrando detalles del control asociado a una alerta crítica:
+    <strong>{{ selected_control.control }}</strong>.
+  </div>
+{% endif %}
+<div class="page-body">
+  <section class="content-main">
+    <div class="card summary-card">
+      <div class="summary-top">
+        <div>
+          <div class="summary-label">Cumplimiento Total</div>
+        <div class="summary-value">
+        {{ compliance }}%
+        <span class="pill risk-pill {{ risk_class }}">Riesgo {{ risk_level }}</span>
+        </div>
+        </div>
+        <div class="summary-next-audit">
+          Próxima auditoría<br>
+          <strong>{{ next_audit }}</strong>
+        </div>
+      </div>
+        <div class="summary-bar">
+        <div class="summary-bar-inner {{ risk_class }}" style="width: {{ compliance }}%;"></div>
+        </div>
+    </div>
+
+    {% for category in categories %}
+      {% set cat_controls = controls|selectattr('categoria','equalto',category)|list %}
+      {% set stats = category_stats[category] %}
+
+      <div class="card category-card">
+        <div class="category-header">
+          <div>
+            <div class="category-title">{{ category }}</div>
+            <div class="category-subtitle">
+              {{ stats.implemented }} de {{ stats.total }} controles implementados
+            </div>
+          </div>
+            <div class="category-progress">
+                <div class="category-progress-inner {{ stats.risk_class }}"
+                    style="width: {{ stats.perc }}%;"></div>
+                </div>
+        </div>
+
+        {% for control in cat_controls %}
+        {% set is_selected = (selected_control and control.id == selected_control.id) %}
+        <div class="control-wrapper">
+            <input
+            type="checkbox"
+            name="implemented_ids"
+            value="{{ control.id }}"
+            class="control-checkbox"
+            {% if control.id in implemented_ids %}checked{% endif %}
+            >
+            <a href="{{ url_for('checklist', control_id=control.id) }}"
+            class="control-row {% if is_selected %}selected{% endif %}">
+            <div class="control-main">
+                <div class="control-title">{{ control.control }}</div>
+                <div class="control-desc">
+                {{ control.descripcion[:150] }}...
+                </div>
+                <div class="control-extra">
+                <span style="font-size:11px; color:#6b7280;">
+                    Dominio: <strong>{{ control.dominio }}</strong>
+                    {% if control.referencia %}
+                    · Ref: <strong>{{ control.referencia }}</strong>
+                    {% endif %}
+                </span>
+                </div>
+            </div>
+            <div class="control-meta">
+              {% if control.madurez %}
+                <span class="badge badge-alta">
+                  Madurez esperada: {{ control.madurez }}/5
+                </span>
+              {% endif %}
+
+              {% if control.from_assessment_extra %}
+                <span class="badge badge-assessment">
+                  Assessment
+                </span>
+              {% elif control.from_assessment_adjusted %}
+                <span class="badge badge-assessment-soft">
+                  Adjusted by assessment
+                </span>
+              {% endif %}
+
+              {% if control.from_ai %}
+                <span class="badge badge-ai">
+                  IA recomendado 
+                </span>
+              {% endif %}
+            </div>
+            </a>
+        </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </section>
+
+  <aside class="content-detail">
+    {% if selected_control %}
+    <div class="card detail-card">
+      <div class="detail-severity">
+        {% if selected_control.madurez %}
+          <span class="badge badge-alta">
+            Nivel de madurez objetivo: {{ selected_control.madurez }}/5
+          </span>
+        {% endif %}
+      </div>
+      <h2 class="detail-title">{{ selected_control.control }}</h2>
+
+      <div class="detail-block">
+        <div class="detail-block-title">Descripción</div>
+        <p>{{ selected_control.descripcion }}</p>
+      </div>
+
+      {% if selected_control.dominio %}
+      <div class="detail-block">
+        <div class="detail-block-title">Dominio</div>
+        <p>{{ selected_control.dominio }}</p>
+      </div>
+      {% endif %}
+
+      {% if selected_control.referencia %}
+      <div class="detail-block">
+        <div class="detail-block-title">Referencia</div>
+        <p>{{ selected_control.referencia }}</p>
+      </div>
+      {% endif %}
+
+      {% if selected_control.recomendacion %}
+      <div class="detail-block">
+        <div class="detail-block-title">Recomendación</div>
+        <p>{{ selected_control.recomendacion }}</p>
+      </div>
+      {% endif %}
+    </div>
+    {% else %}
+      <div class="card detail-card">
+        <p>Selecciona un control para ver los detalles.</p>
+      </div>
+    {% endif %}
+  </aside>
+</div>
+</form>
+{% endblock %}
